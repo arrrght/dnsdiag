@@ -70,7 +70,7 @@ class Colors(object):
 def usage():
     print("""%s version %s
 
-usage: %s [-h] [-f server-list] [-c count] [-t type] [-w wait] hostname
+usage: %s [-hs] [-f server-list] [-c count] [-t type] [-w wait] hostname
   -h  --help        Show this help
   -f  --file        DNS server list to use (default: system resolvers)
   -c  --count       Number of requests to send (default: 10)
@@ -91,12 +91,6 @@ def signal_handler(sig, frame):
     if shutdown:  # pressed twice, so exit immediately
         sys.exit(0)
     shutdown = True  # pressed once, exit gracefully
-
-
-def maxlen(names):
-    sn = sorted(names, key=len)
-    return len(sn[-1])
-
 
 def _order_flags(table):
     return sorted(table.items(), reverse=True)
@@ -244,9 +238,9 @@ def main():
     hostname = 'wikipedia.org'
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hf:c:t:w:TevCm:s",
-                                   ["help", "file=", "count=", "type=", "wait=", "tcp", "edns", "verbose", "color",
-                                    "force-miss", "short"])
+        opts, args = getopt.getopt(sys.argv[1:], "hsf:c:t:w:TevCm",
+                                   ["help", "short", "file=", "count=", "type=", "wait=", "tcp", "edns", "verbose", "color",
+                                    "force-miss"])
     except getopt.GetoptError as err:
         print(err)
         usage()
@@ -306,8 +300,7 @@ def main():
 
         f = [name.strip() for name in f]  # remove annoying blanks
         f = [x for x in f if not x.startswith('#') and len(x)]  # remove comments and empty entries
-
-        width = maxlen(f)
+        width = sorted([ len(re.sub(r'\|.*', '', name)) for name in f ])[-1]
         blanks = (width - 5) * ' '
         if short:
             print('server ', blanks, ' median(ms) lost(%) ttl')

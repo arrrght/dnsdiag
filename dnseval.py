@@ -36,6 +36,7 @@ import time
 import random
 import string
 from statistics import stdev
+from statistics import median
 
 import dns.rdatatype
 import dns.resolver
@@ -79,6 +80,7 @@ usage: %s [-h] [-f server-list] [-c count] [-t type] [-w wait] hostname
   -e  --edns        Disable EDNS0 (Default: Enabled)
   -C  --color       Print colorful output
   -v  --verbose     Print actual dns response
+  -s  --short       Print short version
 """ % (__progname__, __version__, __progname__))
     sys.exit()
 
@@ -197,20 +199,23 @@ def dnsping(host, server, dnsrecord, timeout, count, use_tcp=False, use_edns=Fal
         r_avg = sum(response_times) / r_received
         if len(response_times) > 1:
             r_stddev = stdev(response_times)
+            r_median = median(response_times)
         else:
             r_stddev = 0
+            r_median = 0
     else:
         r_min = 0
         r_max = 0
         r_avg = 0
         r_stddev = 0
+        r_median = 0
 
     if answers is not None:
         flags = answers.response.flags
         if len(answers.response.answer) > 0:
             ttl = answers.response.answer[0].ttl
 
-    return server, r_avg, r_min, r_max, r_stddev, r_lost_percent, flags, ttl, answers
+    return server, r_avg, r_min, r_max, r_stddev, r_lost_percent, flags, ttl, answers, r_median
 
 
 def main():
@@ -233,13 +238,14 @@ def main():
     use_edns = True
     force_miss = False
     verbose = False
+    short = False
     color_mode = False
     hostname = 'wikipedia.org'
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hf:c:t:w:TevCm",
+        opts, args = getopt.getopt(sys.argv[1:], "hf:c:t:w:TevCm:s",
                                    ["help", "file=", "count=", "type=", "wait=", "tcp", "edns", "verbose", "color",
-                                    "force-miss"])
+                                    "force-miss", "short"])
     except getopt.GetoptError as err:
         print(err)
         usage()
@@ -269,6 +275,8 @@ def main():
             use_edns = False
         elif o in ("-C", "--color"):
             color_mode = True
+        elif o in ("-s", "--short"):
+            short = True
         elif o in ("-v", "--verbose"):
             verbose = True
         else:
@@ -300,8 +308,11 @@ def main():
 
         width = maxlen(f)
         blanks = (width - 5) * ' '
-        print('server ', blanks, ' avg(ms)     min(ms)     max(ms)     stddev(ms)  lost(%)  ttl        flags')
-        print((93 + width) * '-')
+        if short:
+            print('server ', blanks, ' median(ms) lost(%) ttl')
+        else:
+            print('server ', blanks, ' avg(ms)     min(ms)     max(ms)     stddev(ms)  lost(%)  ttl        flags')
+            print((93 + width) * '-')
         for server in f:
             # check if we have a valid dns server address
             if server.lstrip() == '':  # deal with empty lines
@@ -324,7 +335,7 @@ def main():
                 continue
 
             try:
-                (resolver, r_avg, r_min, r_max, r_stddev, r_lost_percent, flags, ttl, answers) = dnsping(
+                (resolver, r_avg, r_min, r_max, r_stddev, r_lost_percent, flags, ttl, answers, r_median) = dnsping(
                     hostname,
                     resolver,
                     dnsrecord,
@@ -352,9 +363,12 @@ def main():
                 l_color = color.O
             else:
                 l_color = color.N
-            print("%s    %-8.3f    %-8.3f    %-8.3f    %-8.3f    %s%%%-3d%s     %-8s  %21s" % (
-                resolver, r_avg, r_min, r_max, r_stddev, l_color, r_lost_percent, color.N, s_ttl, text_flags),
-                  flush=True)
+            if short:
+                print("%s    %-8.3f   %-6s  %3s" % ( resolver, r_median, r_lost_percent, s_ttl ), flush=True)
+            else:
+                print("%s    %-8.3f    %-8.3f    %-8.3f    %-8.3f    %s%%%-3d%s     %-8s  %21s" % (
+                    resolver, r_avg, r_min, r_max, r_stddev, l_color, r_lost_percent, color.N, s_ttl, text_flags),
+                      flush=True)
             if verbose and hasattr(answers, 'response'):
                 ans_index = 1
                 for answer in answers.response.answer:

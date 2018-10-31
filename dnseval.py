@@ -35,6 +35,7 @@ import sys
 import time
 import random
 import string
+import re
 from statistics import stdev
 from statistics import median
 
@@ -317,7 +318,12 @@ def main():
             # check if we have a valid dns server address
             if server.lstrip() == '':  # deal with empty lines
                 continue
+            if server.find('|') == -1:
+                s_comment = ''
+            else:
+                s_comment = '<- ' + re.sub(r'.*?\|', '', server)
             server = server.replace(' ', '')
+            server = re.sub(r'\|.*', '', server)
             try:
                 ipaddress.ip_address(server)
             except ValueError:  # so it is not a valid IPv4 or IPv6 address, so try to resolve host name
@@ -364,7 +370,7 @@ def main():
             else:
                 l_color = color.N
             if short:
-                print("%s    %-8.3f   %-6s  %3s" % ( resolver, r_median, r_lost_percent, s_ttl ), flush=True)
+                print("%s    %-8.3f   %-6s  %3s %s" % ( resolver, r_median, r_lost_percent, s_ttl, s_comment ), flush=True)
             else:
                 print("%s    %-8.3f    %-8.3f    %-8.3f    %-8.3f    %s%%%-3d%s     %-8s  %21s" % (
                     resolver, r_avg, r_min, r_max, r_stddev, l_color, r_lost_percent, color.N, s_ttl, text_flags),

@@ -1,35 +1,3 @@
-[![Build Status](https://travis-ci.org/farrokhi/dnsdiag.svg)](https://travis-ci.org/farrokhi/dnsdiag) [![PyPI](https://img.shields.io/pypi/v/dnsdiag.svg?maxAge=8600)](https://pypi.python.org/pypi/dnsdiag/) [![PyPI](https://img.shields.io/pypi/l/dnsdiag.svg?maxAge=8600)]() [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffarrokhi%2Fdnsdiag.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffarrokhi%2Fdnsdiag?ref=badge_shield) [![PyPI](https://img.shields.io/pypi/pyversions/dnsdiag.svg?maxAge=8600)]() [![GitHub stars](https://img.shields.io/github/stars/farrokhi/dnsdiag.svg?style=social&label=Star&maxAge=8600)](https://github.com/farrokhi/dnsdiag/stargazers)
-
-DNS Diagnostics and Performance Measurement Tools
-==================================================
-
-Ever been wondering if your ISP is [hijacking your DNS traffic](https://decentralize.today/is-your-isp-hijacking-your-dns-traffic-f3eb7ccb0ee7#.fevks5wyc)? Ever observed any
-misbehavior with your DNS responses? Ever been redirected to wrong address and
-suspected something is wrong with your DNS? Here we have a [set of tools](http://github.com/farrokhi/dnsdiag) to
-perform basic audits on your DNS requests and responses to make sure your DNS is
-working as you expect.
-
-You can measure the response time of any given DNS server for arbitrary requests
-using `dnsping`. Just like traditional ping utility, it gives you similar
-functionality for DNS requests.
-
-You can also trace the path your DNS request takes to destination to make sure
-it is not being redirected or hijacked. This can be done by comparing different
-DNS queries being sent to the same DNS server using `dnstraceroute` and observe
-if there is any difference between the path.
-
-`dnseval` evaluates multiple DNS resolvers and helps you choose the best DNS
-server for your network. While it is highly recommended to use your own DNS
-resolver and never trust any third-party DNS server, but in case you need to
-choose the best DNS forwarder for your network, `dnseval` lets you compare
-different DNS servers from performance (latency) and reliability (loss) point
-of view.
-
-# prerequisites
-This script requires python3 as well as latest
-[dnspython](http://www.dnspython.org/) and
-[cymruwhois](https://pythonhosted.org/cymruwhois/).
-
 # installation
 
 There are several ways that you can use this toolset. However using the sourcecode is always recommended.
@@ -41,18 +9,14 @@ There are several ways that you can use this toolset. However using the sourceco
 ```
 git clone https://github.com/farrokhi/dnsdiag.git
 cd dnsdiag
-pip3 install -r requirements.txt
+sh ./prepare
 ```
+# dnseval
 
-2. You can alternatively install the package using pip:
-
-```
-pip3 install dnsdiag
-```
-
-## From Binary
-
-From time to time, binary version will be released for Windows, Mac OS X and Linux platforms. You can grab the latest release from [releases page](https://github.com/farrokhi/dnsdiag/releases).
+Short version add (-s swith) added.
+Comment in hosts file added:
+1.1.1.1|my host1!!
+some.dev|dev server, don't touch
 
 # dnsping
 dnsping pings a DNS resolver by sending an arbitrary DNS query for given number

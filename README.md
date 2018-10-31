@@ -10,13 +10,8 @@ There are several ways that you can use this toolset. However using the sourceco
 git clone https://github.com/farrokhi/dnsdiag.git
 cd dnsdiag
 sh ./prepare
+./dnseval.py -f stubby.txt -s -m -c 50 google.com
 ```
-# dnseval
-
-Short version add (-s swith) added.
-Comment in hosts file added:
-1.1.1.1|my host1!!
-some.dev|dev server, don't touch
 
 # dnsping
 dnsping pings a DNS resolver by sending an arbitrary DNS query for given number
@@ -57,6 +52,13 @@ dnstraceroute.py DNS: 8.8.4.4:53, hostname: facebook.com, rdatatype: A
 Using `--expert` will instruct dnstraceroute to print expert hints (such as warnings of possible DNS traffic hijacking).
 
 # dnseval
+
+Comment in hosts file added:
+```
+1.1.1.1|my host1!!
+some.dev|dev server
+```
+
 dnseval is a bulk ping utility that sends an arbitrary DNS query to a give list
 of DNS servers. This script is meant for comparing response time of multiple
 DNS servers at once:
